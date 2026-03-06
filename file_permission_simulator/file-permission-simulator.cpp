@@ -18,13 +18,18 @@ const string RESET = "\x1b[0m";
 
 class User
 {
+protected: 
+    string password;
 public:
     unsigned int permission = 0; // initially 0
     string username;
-    string password;
     unsigned int id;
 
     bool can(unsigned int p) { return (permission & p); }
+
+    void setPassword(string psswd) {
+        password = psswd;
+    }
 };
 
 class NormalUser : public User
@@ -92,7 +97,7 @@ vector<NormalUser> normalUserList;
 void addAdmin(vector<Admin> *x)
 {
     string name, pass;
-    cout << GREEN << "Create Your First Account!\n" << RESET;
+    cout << GREEN << "Create Account!\n" << RESET;
     cout << "==========================\n";
     do {
         cout << GREEN << "Enter Username: " << RESET;
@@ -105,8 +110,9 @@ void addAdmin(vector<Admin> *x)
 
     Admin a;
     a.username = name;
-    a.password = pass;
     a.permission = ROOT;
+    a.setPassword(pass);
+    a.id = x->size() + 1;
 
     x->push_back(a);
 }
@@ -114,7 +120,7 @@ void addAdmin(vector<Admin> *x)
 void addNormalUser(vector<NormalUser> *x)
 {
     string name, pass;
-    cout << GREEN << "Create Your First Account!\n" << RESET;
+    cout << GREEN << "Create Account!\n" << RESET;
     cout << "==========================\n";
     do {
         cout << GREEN << "Enter Username: " << RESET;
@@ -127,19 +133,42 @@ void addNormalUser(vector<NormalUser> *x)
 
     NormalUser a;
     a.username = name;
-    a.password = pass;
+    a.setPassword(pass);
+    a.id = x->size() + 1;
 
     x->push_back(a);
 }
 
+bool login(const string name, const string pass, const string role) {
+    // login logic
+}
+
 int main()
 {
-    string name, password;
+    string name, password, currUserRole;
     unsigned int uid;
+    int index;
 
     if (adminList.size() == 0 && normalUserList.size() == 0)
     {
         addAdmin(&adminList);      // adds an initial user (admin);
+        currUserRole = "admin";
+        uid = adminList.size();
+        index = uid - 1;
+
+        name = adminList[index].username;
+    }
+
+    unsigned int choice;
+
+    while(1) {
+        if (currUserRole == "admin") {
+            //admin logic
+        } else if(currUserRole == "normal user") {
+            //normal user logic
+        } else {
+            break;
+        }
     }
 
     return 0;
