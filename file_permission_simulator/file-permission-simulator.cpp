@@ -18,8 +18,9 @@ const string RESET = "\x1b[0m";
 
 class User
 {
-protected: 
+protected:
     string password;
+
 public:
     unsigned int permission = 0; // initially 0
     string username;
@@ -27,8 +28,19 @@ public:
 
     bool can(unsigned int p) { return (permission & p); }
 
-    void setPassword(string psswd) {
+    void setPassword(string psswd)
+    {
         password = psswd;
+    }
+    bool checkPassword(string pswd)
+    {
+        if (password == pswd)
+        {
+            return 1;
+        }
+        cout << RED << "Incorrect Password!\n"
+             << RESET;
+        return 0;
     }
 };
 
@@ -97,13 +109,16 @@ vector<NormalUser> normalUserList;
 void addAdmin(vector<Admin> *x)
 {
     string name, pass;
-    cout << GREEN << "Create Account!\n" << RESET;
+    cout << GREEN << "Create Account!\n"
+         << RESET;
     cout << "==========================\n";
-    do {
+    do
+    {
         cout << GREEN << "Enter Username: " << RESET;
         getline(cin, name);
     } while (name.empty());
-    do {
+    do
+    {
         cout << GREEN << "Enter Password: " << RESET;
         getline(cin, pass);
     } while (pass.empty());
@@ -120,13 +135,16 @@ void addAdmin(vector<Admin> *x)
 void addNormalUser(vector<NormalUser> *x)
 {
     string name, pass;
-    cout << GREEN << "Create Account!\n" << RESET;
+    cout << GREEN << "Create Account!\n"
+         << RESET;
     cout << "==========================\n";
-    do {
+    do
+    {
         cout << GREEN << "Enter Username: " << RESET;
         getline(cin, name);
     } while (name.empty());
-    do {
+    do
+    {
         cout << GREEN << "Enter Password: " << RESET;
         getline(cin, pass);
     } while (pass.empty());
@@ -139,8 +157,92 @@ void addNormalUser(vector<NormalUser> *x)
     x->push_back(a);
 }
 
-bool login(const string name, const string pass, const string role) {
-    // login logic
+int getUid(const string username, const string role)
+{
+    if (role == "admin")
+    {
+        for (int i = 0; i < adminList.size(); i++)
+        {
+            if (adminList[i].username == username)
+            {
+                return i + 1;
+            }
+        }
+    }
+    else if (role == "normal user")
+    {
+        for (int i = 0; i < normalUserList.size(); i++)
+        {
+            if (normalUserList[i].username == username)
+            {
+                return i + 1;
+            }
+        }
+    }
+
+    cout << RED << "User Not Found!\n"
+         << RESET;
+    return 0;
+}
+
+int adminLogin()
+{
+    string name, pass;
+    do
+    {
+        cout << GREEN << "Enter Username: " << RESET;
+        getline(cin, name);
+    } while (name.empty());
+
+    int uid = getUid(name, "admin");
+    if (!uid)
+    {
+        return 0;
+    }
+
+    do
+    {
+        cout << GREEN << "Enter Password: " << RESET;
+        getline(cin, pass);
+    } while (pass.empty());
+
+    if (!(adminList[uid - 1].checkPassword(pass)))
+    {
+        return 0;
+    }
+    cout << BLUE << "Login Successful!\n"
+         << RESET;
+    return uid;
+}
+
+int normalUserLogin()
+{
+    string name, pass;
+    do
+    {
+        cout << GREEN << "Enter Username: " << RESET;
+        getline(cin, name);
+    } while (name.empty());
+
+    int uid = getUid(name, "normal user");
+    if (!uid)
+    {
+        return 0;
+    }
+
+    do
+    {
+        cout << GREEN << "Enter Password: " << RESET;
+        getline(cin, pass);
+    } while (pass.empty());
+
+    if (!(normalUserList[uid - 1].checkPassword(pass)))
+    {
+        return 0;
+    }
+    cout << BLUE << "Login Successful!\n"
+         << RESET;
+    return uid;
 }
 
 int main()
@@ -151,7 +253,7 @@ int main()
 
     if (adminList.size() == 0 && normalUserList.size() == 0)
     {
-        addAdmin(&adminList);      // adds an initial user (admin);
+        addAdmin(&adminList); // adds an initial user (admin);
         currUserRole = "admin";
         uid = adminList.size();
         index = uid - 1;
@@ -161,12 +263,53 @@ int main()
 
     unsigned int choice;
 
-    while(1) {
-        if (currUserRole == "admin") {
-            //admin logic
-        } else if(currUserRole == "normal user") {
-            //normal user logic
-        } else {
+    while (1)
+    {
+        cout << BLUE << "\nWelcome to File System Simulator\n"
+             << RESET;
+        cout << "==================================================\n";
+        cout << RED << "[Just Click Enter to Exit]\n";
+        cout << "[Enter \'admin\' to go admin]\n";
+        cout << "[Enter \'normal user\' to login as normal user]\n\n";
+        cout << GREEN << "Enter Role: " << RESET;
+        getline(cin, currUserRole);
+
+        if (currUserRole == "admin")
+        {
+            // admin logic
+            if (!(uid = adminLogin()))
+            {
+                // failed login
+                cout << "Failed Login" << endl;
+                break;
+            }
+            else
+            {
+                // successful login
+                cout << "Login Successful" << endl;
+                cout << adminList[uid - 1].username << " " << adminList[uid - 1].id << endl;
+                break;
+            }
+        }
+        else if (currUserRole == "normal user")
+        {
+            // normal user logic
+            if (!(uid = normalUserLogin()))
+            {
+                // failed login
+                cout << "Failed Login" << endl;
+                break;
+            }
+            else
+            {
+                // successful login
+                cout << "Login Successful" << endl;
+                cout << normalUserList[uid - 1].username << " " << normalUserList[uid - 1].id << endl;
+                break;
+            }
+        }
+        else
+        {
             break;
         }
     }
