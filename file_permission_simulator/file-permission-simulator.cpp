@@ -9,7 +9,11 @@ const unsigned int WRITE = 1 << 1;   // 2
 const unsigned int DELETE = 1 << 2;  // 4
 const unsigned int EXECUTE = 1 << 3; // 8
 
-const unsigned int ROOT = 0 | READ | WRITE | DELETE | EXECUTE; // 15
+const unsigned int ROOT = 15; // 1111
+
+const char ROLE_ADMIN = 1<<5;           // 00100000
+const char ROLE_NORMAL_USER = 1<<4;     // 00010000
+const char ROLE_MASK = 0x30;            // 00110000
 
 const string RED = "\x1b[31m";
 const string GREEN = "\x1b[32m";
@@ -22,27 +26,24 @@ protected:
     string password;
 
 public:
-    unsigned int permission = 0; // initially 0
     string username;
-    unsigned int id;
+    char role = 0;
+    unsigned int permission = 0; // initially 0
 
     bool can(unsigned int p) { return (permission & p) == p; }
 
-    void setPassword(string psswd)
-    {
-        password = psswd;
+    void setPassword(string psswd) { password = psswd; }
+
+    void setRole(unsigned char rolebit) {
+        role &= ~0x30;          // resets the role first, in case it contains another value;
+        role |= rolebit;        // sets the role to the rolebit;
     }
-    bool checkPassword(string pswd)
-    {
-        if (password == pswd)
-        {
-            return 1;
-        }
-        cout << RED << "Incorrect Password!\n"
-             << RESET;
-        return 0;
-    }
+
+    bool isAdmin() {return (role & 0x20);}          // check bit 5
+    bool isNormalUser() {return (role & 0x10);}     // check bit 4
 };
+
+vector <User> users;
 
 class NormalUser : public User
 {
@@ -348,7 +349,8 @@ int main()
 {
     string name, password, currUserRole;
     unsigned int uid;
-    int index, choice;
+    int index;
+    unsigned int choice;
 
     if (adminList.size() == 0 && normalUserList.size() == 0)
     {
@@ -359,8 +361,6 @@ int main()
 
         name = adminList[index].username;
     }
-
-    unsigned int choice;
 
     while (1)
     {
@@ -410,7 +410,7 @@ int main()
                     }
                     /*switch(choice) {
                         case 1: user.createAccount(); break;
-                        case 2: user.setPermission(); break;
+                        case 2: user.setPermission(normalUserList[0]); break;
                         case 3: user.revokePermission(); break;
                         case 4: user.togglePermission(); break;
                         case 0: exit(0);
