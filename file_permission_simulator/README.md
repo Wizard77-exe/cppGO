@@ -4,8 +4,9 @@ This file is a simple simulator to show file permission management using bitwise
 ---
 ## Modules
 ---
-1. <iostream> - standard input and output stream
+1. <iostream> - standard input and output stream.
 2. <vector> - STL container. Basically a dynamic array.
+3. <iomanip> - for formatting output.
 ---
 ## Features
 ---

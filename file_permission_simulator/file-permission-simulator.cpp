@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
@@ -42,7 +43,7 @@ class User {
         bool isNormalUser() { return (status & ROLE_NORMAL_USER) > 0; } // check bit 4
 
         void showPermissions() {
-            cout << GREEN << "[ID]: " << id << " | [Username]: " << username << " | [Permissions]: ";
+            cout << GREEN << "[ID]: " << left << setw(10) << id << "[Username]: " << left << setw(30) << username << "[Permissions]: ";
             cout << (can(READ) ? "R" : "-");
             cout << (can(WRITE) ? "W" : "-");
             cout << (can(DELETE) ? "D" : "-");
