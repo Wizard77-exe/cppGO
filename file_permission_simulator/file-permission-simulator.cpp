@@ -113,8 +113,6 @@ unsigned int checkUserName(const string name)
 class Admin : public User {
     public:
         void setPermission() {
-            if (cin.peek() == '\n')
-                cin.ignore(10000, '\n');
             string name;
             int uid;
             do {
@@ -166,7 +164,6 @@ class Admin : public User {
         }
 
         void togglePermission() {
-            if (cin.peek() == '\n') cin.ignore(10000, '\n');
             string name;
             int uid;
             do {
@@ -220,7 +217,6 @@ class Admin : public User {
             cout << "==================================================\n\n";
         }
         void revokePermission() {
-            if (cin.peek() == '\n') cin.ignore(10000, '\n');
             string name;
             int uid;
             do {
