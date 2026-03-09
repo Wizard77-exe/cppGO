@@ -27,7 +27,8 @@ This file is a simple simulator to show file permission management using bitwise
 1. Add real file management using <fstream> (file handline)
 2. Add password hashing
 3. TUI - Terminal User Interface using <ncurses>
-4. others.
+4. Check current user.
+5. Check if username exists when setting, toggling, or revoking a permission
 ---
 ## Cloning
 1. Clone the Repository
