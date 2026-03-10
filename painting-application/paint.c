@@ -10,12 +10,28 @@ bool initSDL() {
 }
 
 void draw(SDL_Renderer *renderer, int x, int y, int brushSize, SDL_Color color) {
-    if (brushSize <= 0) {
-        brushSize = 1;
-    }
+    if (brushSize <= 0) brushSize = 1;
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     SDL_Rect rect = {x - brushSize / 2, y - brushSize / 2, brushSize, brushSize};
     SDL_RenderFillRect(renderer, &rect);
+}
+
+void drawThickLine(SDL_Renderer *renderer, int lastX, int lastY, int currX, int currY, int brushSize, SDL_Color color) {
+    float dx = currX - lastX;
+    float dy = currY - lastY;
+    float distance = sqrt(dx*dx + dy*dy);
+
+    if (distance == 0) {
+        draw(renderer, currX, currY, brushSize, color);
+        return;
+    }
+
+    for (float i = 0; i < distance; i++) {
+        float t = i / distance;
+        int x = lastX + t*dx;
+        int y = lastY + t*dy;
+        draw(renderer, x, y, brushSize, color);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -46,22 +62,32 @@ int main(int argc, char *argv[]) {
     bool drawing = false;
 
     int brushSize = 5;
+
+    int lastX, lastY;
     SDL_Color color = {255, 255, 255, 255};
     SDL_Event event;
+
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+
+    Uint32 frameStart;
+    int frameTime;
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
     //MAIN LOOP
     while(running) {
+        frameStart = SDL_GetTicks();
+
         while(SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT) {
                 running = false;
             } else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 drawing = true;
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                draw(renderer, x, y, brushSize, color);
+                lastX = event.button.x;
+                lastY = event.button.y;
+                drawThickLine(renderer, lastX, lastY, event.motion.x, event.motion.y, brushSize, color);
             } else if(event.type == SDL_MOUSEBUTTONUP) {
                 if (event.button.button == SDL_BUTTON_LEFT)drawing = false;
             } else if(event.type == SDL_KEYDOWN) {
@@ -95,11 +121,17 @@ int main(int argc, char *argv[]) {
             }
 
             if (event.type == SDL_MOUSEMOTION && drawing) {
-                draw(renderer, event.motion.x, event.motion.y, brushSize, color);
+                drawThickLine(renderer, lastX, lastY, event.motion.x, event.motion.y, brushSize, color);
+                lastX = event.motion.x;
+                lastY = event.motion.y;
             }
         }
 
         SDL_RenderPresent(renderer);
+
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime)
+            SDL_Delay(frameDelay - frameTime);
     }
 
     SDL_DestroyRenderer(renderer);
