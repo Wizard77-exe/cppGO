@@ -36,3 +36,4 @@ cd painting-application
 gcc paint.c -o paint -lmingw32 -lSDL2main -lSDL2
 ./paint
 ```
+![Example Output](image.png)
