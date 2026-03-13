@@ -15,6 +15,7 @@ bool initSDL() {
 
 int main(int argc, char *argv[]) {
     if (!(initSDL())) return 1;
+
     SDL_Window *window = SDL_CreateWindow("Logic Gate Simulator",
                                           SDL_WINDOWPOS_CENTERED,
                                           SDL_WINDOWPOS_CENTERED,
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
         SDL_Quit();
     }
 
+    // Variables
     SDL_Event event;
     bool running = true;
     float x = 0.0f, y = 275.0f;
